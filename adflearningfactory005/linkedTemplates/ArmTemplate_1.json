@@ -738,7 +738,7 @@
 				],
 				"type": "BlobEventsTrigger",
 				"typeProperties": {
-					"blobPathBeginsWith": "/ecu-data/blobs/ecu-data/incoming/",
+					"blobPathBeginsWith": "/ecu-data/blobs/incoming/",
 					"blobPathEndsWith": ".csv",
 					"ignoreEmptyBlobs": true,
 					"scope": "[parameters('TR_STORAGE_EVENT_properties_typeProperties_scope')]",
