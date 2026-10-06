@@ -1,0 +1,32 @@
+{
+	"name": "PL_storage_event_ingestion",
+	"properties": {
+		"activities": [
+			{
+				"name": "copy new file",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"enableStaging": false
+				}
+			}
+		],
+		"parameters": {
+			"p_fileName": {
+				"type": "string"
+			},
+			"p_folderPath": {
+				"type": "string"
+			}
+		},
+		"annotations": []
+	}
+}
