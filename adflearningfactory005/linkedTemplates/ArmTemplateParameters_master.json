@@ -1,0 +1,42 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "adflearningfactory005"
+		},
+		"LS_ADLSGen2_properties_typeProperties_url": {
+			"value": "https://adflearningstorageacc1.dfs.core.windows.net/"
+		},
+		"LS_DummyJSON_REST_properties_typeProperties_url": {
+			"value": "https://dummyjson.com/"
+		},
+		"LS_KeyVault_properties_typeProperties_baseUrl": {
+			"value": "https://kv-adf-learning-001.vault.azure.net/"
+		},
+		"LS_OpenMeteo_HTTP_properties_typeProperties_url": {
+			"value": "https://api.open-meteo.com/"
+		},
+		"LS_OpenMeteo_REST_properties_typeProperties_url": {
+			"value": "https://api.open-meteo.com/v1/forecast?latitude=51.5072&longitude=-0.1276&current=temperature_2m"
+		},
+		"LS_SQL_DB_properties_typeProperties_server": {
+			"value": "adfsqllogicalserver.database.windows.net"
+		},
+		"LS_SQL_DB_properties_typeProperties_database": {
+			"value": "adffreesqldb"
+		},
+		"TR_STORAGE_EVENT_properties_PL_storage_event_ingestion_parameters_p_fileName": {
+			"value": "@triggerbody().filename"
+		},
+		"TR_STORAGE_EVENT_properties_typeProperties_scope": {
+			"value": "/subscriptions/9d7a6bbb-9968-4f35-abe0-da55a8fb7421/resourceGroups/ADF-Learning-RG/providers/Microsoft.Storage/storageAccounts/adflearningstorageacc1"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}
