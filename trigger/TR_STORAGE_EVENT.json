@@ -1,0 +1,28 @@
+{
+	"name": "TR_STORAGE_EVENT",
+	"properties": {
+		"annotations": [],
+		"runtimeState": "Started",
+		"pipelines": [
+			{
+				"pipelineReference": {
+					"referenceName": "PL_storage_event_ingestion",
+					"type": "PipelineReference"
+				},
+				"parameters": {
+					"p_fileName": "@triggerbody().filename"
+				}
+			}
+		],
+		"type": "BlobEventsTrigger",
+		"typeProperties": {
+			"blobPathBeginsWith": "/ecu-data/blobs/ecu-data/incoming/",
+			"blobPathEndsWith": ".csv",
+			"ignoreEmptyBlobs": true,
+			"scope": "/subscriptions/9d7a6bbb-9968-4f35-abe0-da55a8fb7421/resourceGroups/ADF-Learning-RG/providers/Microsoft.Storage/storageAccounts/adflearningstorageacc1",
+			"events": [
+				"Microsoft.Storage.BlobCreated"
+			]
+		}
+	}
+}
