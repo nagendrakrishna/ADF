@@ -1,0 +1,97 @@
+{
+	"name": "DS_dest_bronze_ADLS",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLSGen2",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"dsp_fileName": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "DelimitedText",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "bronze",
+				"fileSystem": "ecu-data"
+			},
+			"columnDelimiter": ",",
+			"escapeChar": "\\",
+			"firstRowAsHeader": true,
+			"quoteChar": "\""
+		},
+		"schema": [
+			{
+				"name": "Reference Number",
+				"type": "String"
+			},
+			{
+				"name": "Recipient",
+				"type": "String"
+			},
+			{
+				"name": "Amount sent GBP",
+				"type": "String"
+			},
+			{
+				"name": "Amount received INR",
+				"type": "String"
+			},
+			{
+				"name": "Fees",
+				"type": "String"
+			},
+			{
+				"name": "Submitted on",
+				"type": "String"
+			},
+			{
+				"name": "Delivery method",
+				"type": "String"
+			},
+			{
+				"name": "Payment method",
+				"type": "String"
+			},
+			{
+				"name": "Status",
+				"type": "String"
+			},
+			{
+				"name": "Prop_9",
+				"type": "String"
+			},
+			{
+				"name": "Prop_10",
+				"type": "String"
+			},
+			{
+				"name": "Prop_11",
+				"type": "String"
+			},
+			{
+				"name": "Prop_12",
+				"type": "String"
+			},
+			{
+				"name": "Prop_13",
+				"type": "String"
+			},
+			{
+				"name": "Prop_14",
+				"type": "String"
+			},
+			{
+				"name": "2500",
+				"type": "String"
+			},
+			{
+				"name": "Prop_16",
+				"type": "String"
+			}
+		]
+	}
+}
