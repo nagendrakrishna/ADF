@@ -1,0 +1,196 @@
+{
+	"name": "PL_ChangeDataCapture_Customer",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup_lastModified_Timestamp",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "SELECT last_updated_utc  AS StartWatermark  FROM control.pipeline_watermark WHERE pipeline_name = 'PL_ChangeDataCapture_Customer'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_WATERMARK",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Lookup_latest_Timestamp",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select max(LastModifiedDate) AS EndWatermark, Max(RowId) AS LatestRowId from source.Customer ",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_Customer",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "If Condition1",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Lookup_lastModified_Timestamp",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Lookup_latest_Timestamp",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(activity('Lookup_latest_Timestamp').output.firstRow.EndWatermark,activity('Lookup_lastModified_Timestamp').output.firstRow.StartWatermark )",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Copy to ADLS",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@concat(\n'SELECT * FROM source.Customer WHERE LastModifiedDate > ''',\nactivity('Lookup_lastModified_Timestamp').output.firstRow.StartWatermark,\n''' AND LastModifiedDate <= ''',\nactivity('Lookup_latest_Timestamp').output.firstRow.EndWatermark,\n''''\n)",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "DelimitedTextSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "DelimitedTextWriteSettings",
+										"quoteAllText": true,
+										"fileExtension": ".txt"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_SQL_Customer",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_Customer_CSV",
+									"type": "DatasetReference"
+								}
+							]
+						},
+						{
+							"name": "UpdateWatermark",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Copy to ADLS",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "LS_SQL_DB",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"parameters": [
+											{
+												"name": "newWatermark",
+												"type": "Datetime",
+												"value": {
+													"value": "@activity('Lookup_latest_Timestamp').output.firstRow.EndWatermark",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											},
+											{
+												"name": "lastProcessedRowId",
+												"type": "Int64",
+												"value": {
+													"value": "@activity('Lookup_latest_Timestamp').output.firstRow.LatestRowId",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											}
+										],
+										"type": "Query",
+										"text": "UPDATE control.pipeline_watermark SET last_updated_utc = @newWatermark, last_processed_vehicle_id = @lastProcessedRowId where pipeline_name = 'PL_ChangeDataCapture_Customer'"
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2026-09-30T13:39:29Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

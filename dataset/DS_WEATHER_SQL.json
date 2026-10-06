@@ -1,0 +1,43 @@
+{
+	"name": "DS_WEATHER_SQL",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SQL_DB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "location_id",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "location_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "latitude",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 6
+			},
+			{
+				"name": "longitude",
+				"type": "decimal",
+				"precision": 9,
+				"scale": 6
+			},
+			{
+				"name": "is_active",
+				"type": "bit"
+			}
+		],
+		"typeProperties": {
+			"schema": "control",
+			"table": "weather_locations"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

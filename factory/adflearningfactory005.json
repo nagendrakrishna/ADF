@@ -1,0 +1,15 @@
+{
+	"name": "adflearningfactory005",
+	"properties": {
+		"trustModeClaimForMi": {
+			"value": "Disabled",
+			"editable": true
+		}
+	},
+	"location": "centralus",
+	"identity": {
+		"type": "SystemAssigned",
+		"principalId": "270afac9-d1c3-4f9b-ba2d-3dcdb4a6a329",
+		"tenantId": "1faa39f9-00ef-4bab-8471-58cab497d42b"
+	}
+}

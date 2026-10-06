@@ -1,0 +1,32 @@
+{
+	"name": "DS_SQL_WATERMARK",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SQL_DB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "pipeline_name",
+				"type": "nvarchar"
+			},
+			{
+				"name": "last_processed_vehicle_id",
+				"type": "bigint",
+				"precision": 19
+			},
+			{
+				"name": "last_updated_utc",
+				"type": "datetime2",
+				"scale": 0
+			}
+		],
+		"typeProperties": {
+			"schema": "CONTROL",
+			"table": "pipeline_watermark"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

@@ -1,0 +1,16 @@
+{
+	"name": "DS_REST_Users",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_DummyJSON_REST",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "RestResource",
+		"typeProperties": {
+			"relativeUrl": "users?limit=20&skip={offset}"
+		},
+		"schema": []
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

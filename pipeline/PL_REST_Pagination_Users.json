@@ -1,0 +1,66 @@
+{
+	"name": "PL_REST_Pagination_Users",
+	"properties": {
+		"activities": [
+			{
+				"name": "Copy data1",
+				"type": "Copy",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "RestSource",
+						"httpRequestTimeout": "00:01:40",
+						"requestInterval": "00.00:00:00.010",
+						"requestMethod": "GET",
+						"paginationRules": {
+							"supportRFC5988": "false",
+							"QueryParameters.{offset}": "RANGE:0::20",
+							"EndCondition:$.users": "Empty",
+							"MaxRequestNumber": "20"
+						}
+					},
+					"sink": {
+						"type": "JsonSink",
+						"storeSettings": {
+							"type": "AzureBlobFSWriteSettings"
+						},
+						"formatSettings": {
+							"type": "JsonWriteSettings"
+						}
+					},
+					"enableStaging": false
+				},
+				"inputs": [
+					{
+						"referenceName": "DS_REST_Users",
+						"type": "DatasetReference"
+					}
+				],
+				"outputs": [
+					{
+						"referenceName": "DS_ADLS_Weather_Raw_JSON",
+						"type": "DatasetReference",
+						"parameters": {
+							"p_folder_path": "rest/users/raw",
+							"p_file_path": {
+								"value": "users_@{formatDateTime(utcNow(),'HHmmss')}.json",
+								"type": "Expression"
+							}
+						}
+					}
+				]
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2026-10-04T10:27:55Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}

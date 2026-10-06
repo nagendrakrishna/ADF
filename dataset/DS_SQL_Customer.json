@@ -1,0 +1,45 @@
+{
+	"name": "DS_SQL_Customer",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SQL_DB",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [
+			{
+				"name": "RowId",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "CustomerName",
+				"type": "varchar"
+			},
+			{
+				"name": "City",
+				"type": "varchar"
+			},
+			{
+				"name": "CreatedDate",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "LastModifiedDate",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "IsDeleted",
+				"type": "bit"
+			}
+		],
+		"typeProperties": {
+			"schema": "source",
+			"table": "Customer"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

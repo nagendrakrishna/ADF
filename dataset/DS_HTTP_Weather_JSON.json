@@ -1,0 +1,30 @@
+{
+	"name": "DS_HTTP_Weather_JSON",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_OpenMeteo_HTTP",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"DSP_latitude": {
+				"type": "string"
+			},
+			"DSP_longitude": {
+				"type": "string"
+			}
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "HttpServerLocation",
+				"relativeUrl": {
+					"value": "/v1/forecast?latitude=@{dataset().DSP_latitude}&longitude=@{dataset().DSP_longitude}&current=temperature_2m,relative_humidity_2m,wind_speed_10m,precipitation",
+					"type": "Expression"
+				}
+			}
+		},
+		"schema": {}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

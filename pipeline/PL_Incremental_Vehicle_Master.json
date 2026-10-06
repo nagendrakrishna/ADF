@@ -1,0 +1,191 @@
+{
+	"name": "PL_Incremental_Vehicle_Master",
+	"properties": {
+		"activities": [
+			{
+				"name": "Lookup_lastProcessedrowId",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select last_processed_vehicle_id from control.pipeline_watermark where pipeline_name = 'PL_Incremental_Vehicle_Master'",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_WATERMARK",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "Lookup_New_Watermark",
+				"type": "Lookup",
+				"dependsOn": [],
+				"policy": {
+					"timeout": "0.12:00:00",
+					"retry": 0,
+					"retryIntervalInSeconds": 30,
+					"secureOutput": false,
+					"secureInput": false
+				},
+				"userProperties": [],
+				"typeProperties": {
+					"source": {
+						"type": "AzureSqlSource",
+						"sqlReaderQuery": "select MAX(vehicle_id) AS new_watermark\nFrom source.vehicle_master",
+						"queryTimeout": "02:00:00",
+						"partitionOption": "None"
+					},
+					"dataset": {
+						"referenceName": "DS_SQL_vehicle_master",
+						"type": "DatasetReference"
+					}
+				}
+			},
+			{
+				"name": "If Condition",
+				"type": "IfCondition",
+				"dependsOn": [
+					{
+						"activity": "Lookup_New_Watermark",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					},
+					{
+						"activity": "Lookup_lastProcessedrowId",
+						"dependencyConditions": [
+							"Succeeded"
+						]
+					}
+				],
+				"userProperties": [],
+				"typeProperties": {
+					"expression": {
+						"value": "@greater(\n    activity('Lookup_New_Watermark').output.firstRow.new_watermark,\n    activity('Lookup_lastProcessedrowId').output.firstRow.last_processed_vehicle_id\n)",
+						"type": "Expression"
+					},
+					"ifTrueActivities": [
+						{
+							"name": "Copy_SQL_to_ADLS",
+							"type": "Copy",
+							"dependsOn": [],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"typeProperties": {
+								"source": {
+									"type": "AzureSqlSource",
+									"sqlReaderQuery": {
+										"value": "@concat(\n    'SELECT * FROM source.vehicle_master WHERE vehicle_id > ',\n    string(activity('Lookup_lastProcessedrowId').output.firstRow.last_processed_vehicle_id),\n    ' AND vehicle_id <= ',\n    string(activity('Lookup_New_Watermark').output.firstRow.new_watermark),\n    ' ORDER BY vehicle_id'\n)",
+										"type": "Expression"
+									},
+									"queryTimeout": "02:00:00",
+									"partitionOption": "None"
+								},
+								"sink": {
+									"type": "ParquetSink",
+									"storeSettings": {
+										"type": "AzureBlobFSWriteSettings"
+									},
+									"formatSettings": {
+										"type": "ParquetWriteSettings"
+									}
+								},
+								"enableStaging": false,
+								"translator": {
+									"type": "TabularTranslator",
+									"typeConversion": true,
+									"typeConversionSettings": {
+										"allowDataTruncation": true,
+										"treatBooleanAsNumber": false
+									}
+								}
+							},
+							"inputs": [
+								{
+									"referenceName": "DS_SQL_vehicle_master",
+									"type": "DatasetReference"
+								}
+							],
+							"outputs": [
+								{
+									"referenceName": "DS_ADLS_Vehicle_Master_Parquet",
+									"type": "DatasetReference",
+									"parameters": {
+										"p_file_name": {
+											"value": "@concat(\n    'vehicle_master_',\n    string(add(int(activity('Lookup_lastProcessedrowId').output.firstRow.last_processed_vehicle_id), 1)),\n    '_',\n    string(activity('Lookup_New_Watermark').output.firstRow.new_watermark),\n    '.parquet'\n)",
+											"type": "Expression"
+										}
+									}
+								}
+							]
+						},
+						{
+							"name": "UPDATE_WATERMARK_TABLE",
+							"type": "Script",
+							"dependsOn": [
+								{
+									"activity": "Copy_SQL_to_ADLS",
+									"dependencyConditions": [
+										"Succeeded"
+									]
+								}
+							],
+							"policy": {
+								"timeout": "0.12:00:00",
+								"retry": 0,
+								"retryIntervalInSeconds": 30,
+								"secureOutput": false,
+								"secureInput": false
+							},
+							"userProperties": [],
+							"linkedServiceName": {
+								"referenceName": "LS_SQL_DB",
+								"type": "LinkedServiceReference"
+							},
+							"typeProperties": {
+								"scripts": [
+									{
+										"parameters": [
+											{
+												"name": "new_watermark",
+												"type": "Int64",
+												"value": {
+													"value": "@activity('Lookup_New_Watermark').output.firstRow.new_watermark",
+													"type": "Expression"
+												},
+												"direction": "Input"
+											}
+										],
+										"type": "Query",
+										"text": "UPDATE control.pipeline_watermark\nSET last_processed_vehicle_id = @new_watermark,\nlast_updated_utc = SYSUTCDATETIME()\nWHERE pipeline_name = 'PL_Incremental_Vehicle_master';"
+									}
+								],
+								"scriptBlockExecutionTimeout": "02:00:00"
+							}
+						}
+					]
+				}
+			}
+		],
+		"annotations": [],
+		"lastPublishTime": "2026-09-27T19:02:25Z"
+	},
+	"type": "Microsoft.DataFactory/factories/pipelines"
+}
