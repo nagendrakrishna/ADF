@@ -821,6 +821,23 @@
 								}
 							}
 						]
+					},
+					{
+						"name": "Fail1",
+						"type": "Fail",
+						"dependsOn": [
+							{
+								"activity": "copy new file",
+								"dependencyConditions": [
+									"Succeeded"
+								]
+							}
+						],
+						"userProperties": [],
+						"typeProperties": {
+							"message": "testingADFALerts",
+							"errorCode": "TEST001"
+						}
 					}
 				],
 				"policy": {
