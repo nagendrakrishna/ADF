@@ -83,7 +83,11 @@
 						]
 					}
 				],
-				"userProperties": []
+				"userProperties": [],
+				"typeProperties": {
+					"message": "testingADFALerts",
+					"errorCode": "TEST001"
+				}
 			}
 		],
 		"parameters": {
