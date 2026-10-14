@@ -1,0 +1,21 @@
+{
+	"name": "LS_SQL_SERVER_SHIR",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"server": "Krishna",
+			"database": "AzureDataEngineeringPractice",
+			"encrypt": "mandatory",
+			"trustServerCertificate": true,
+			"authenticationType": "SQL",
+			"userName": "ADF_USER",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiJhNjNjM2U1My1iN2RjLTQzMzUtYmM5YS1iNWM1YWQxZGM4ODQiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "SelfHostedIR",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}
