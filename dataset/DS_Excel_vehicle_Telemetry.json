@@ -1,0 +1,20 @@
+{
+	"name": "DS_Excel_vehicle_Telemetry",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_ADLSGen2",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Excel",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "vehicle_telemetry_silver",
+				"fileSystem": "on-prem-data"
+			},
+			"firstRowAsHeader": true
+		},
+		"schema": []
+	}
+}

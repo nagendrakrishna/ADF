@@ -1,0 +1,69 @@
+{
+	"name": "DS_OnPremSQL_silver",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "LS_SQL_SERVER_SHIR",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [
+			{
+				"name": "event_id",
+				"type": "varchar"
+			},
+			{
+				"name": "vin",
+				"type": "varchar"
+			},
+			{
+				"name": "speed_kmh",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "model_year",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "powertrain_type",
+				"type": "varchar"
+			},
+			{
+				"name": "odometer_km",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 2
+			},
+			{
+				"name": "battery_soc_pct",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "charging_status",
+				"type": "varchar"
+			},
+			{
+				"name": "event_time",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "received_time",
+				"type": "datetime2",
+				"scale": 7
+			},
+			{
+				"name": "receiving_delay_seconds",
+				"type": "int",
+				"precision": 10
+			}
+		],
+		"typeProperties": {
+			"schema": "silver",
+			"table": "vehicle_telemetry"
+		}
+	}
+}
