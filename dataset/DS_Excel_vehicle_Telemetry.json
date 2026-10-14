@@ -8,8 +8,10 @@
 		"annotations": [],
 		"type": "Excel",
 		"typeProperties": {
+			"sheetName": "Sheet1",
 			"location": {
 				"type": "AzureBlobFSLocation",
+				"fileName": "vehicle_telemetry_silver.xlsx",
 				"folderPath": "vehicle_telemetry_silver",
 				"fileSystem": "on-prem-data"
 			},
