@@ -7,6 +7,10 @@
 			"metadata": "Data Factory name",
 			"defaultValue": "adflearningfactory005"
 		},
+		"LS_SQL_SERVER_SHIR_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'LS_SQL_SERVER_SHIR'"
+		},
 		"LS_ADLSGen2_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://adflearningstorageacc1.dfs.core.windows.net/"
@@ -42,6 +46,18 @@
 		"TR_STORAGE_EVENT_properties_typeProperties_scope": {
 			"type": "string",
 			"defaultValue": "/subscriptions/9d7a6bbb-9968-4f35-abe0-da55a8fb7421/resourceGroups/ADF-Learning-RG/providers/Microsoft.Storage/storageAccounts/adflearningstorageacc1"
+		},
+		"LS_SQL_SERVER_SHIR_properties_typeProperties_server": {
+			"type": "string",
+			"defaultValue": "Krishna"
+		},
+		"LS_SQL_SERVER_SHIR_properties_typeProperties_database": {
+			"type": "string",
+			"defaultValue": "AzureDataEngineeringPractice"
+		},
+		"LS_SQL_SERVER_SHIR_properties_typeProperties_userName": {
+			"type": "string",
+			"defaultValue": "ADF_USER"
 		}
 	},
 	"variables": {
@@ -1496,6 +1512,218 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/pipelines/PL_Weather_HTTP_To_ADLS')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SelfHostedIR')]",
+			"type": "Microsoft.DataFactory/factories/integrationRuntimes",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "SelfHosted",
+				"typeProperties": {}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/LS_SQL_SERVER_SHIR')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "SqlServer",
+				"typeProperties": {
+					"server": "[parameters('LS_SQL_SERVER_SHIR_properties_typeProperties_server')]",
+					"database": "[parameters('LS_SQL_SERVER_SHIR_properties_typeProperties_database')]",
+					"encrypt": "mandatory",
+					"trustServerCertificate": true,
+					"authenticationType": "SQL",
+					"userName": "[parameters('LS_SQL_SERVER_SHIR_properties_typeProperties_userName')]",
+					"password": {
+						"type": "SecureString",
+						"value": "[parameters('LS_SQL_SERVER_SHIR_password')]"
+					}
+				},
+				"connectVia": {
+					"referenceName": "SelfHostedIR",
+					"type": "IntegrationRuntimeReference"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/integrationRuntimes/SelfHostedIR')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/PL_OnPremData')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Copy data1",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "0.12:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"source": {
+								"type": "SqlServerSource",
+								"sqlReaderQuery": "select * from silver.vehicle_telemetry",
+								"queryTimeout": "00:05:00",
+								"partitionOption": "None"
+							},
+							"sink": {
+								"type": "DelimitedTextSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "DelimitedTextWriteSettings",
+									"quoteAllText": true,
+									"fileExtension": ".txt"
+								}
+							},
+							"enableStaging": false,
+							"translator": {
+								"type": "TabularTranslator",
+								"typeConversion": true,
+								"typeConversionSettings": {
+									"allowDataTruncation": true,
+									"treatBooleanAsNumber": false
+								}
+							}
+						},
+						"inputs": [
+							{
+								"referenceName": "DS_OnPremSQL_silver",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DS_CSV_OnPremData",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"policy": {
+					"elapsedTimeMetric": {}
+				},
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/DS_OnPremSQL_silver')]",
+				"[concat(variables('factoryId'), '/datasets/DS_CSV_OnPremData')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_OnPremSQL_silver')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_SQL_SERVER_SHIR",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [
+					{
+						"name": "event_id",
+						"type": "varchar"
+					},
+					{
+						"name": "vin",
+						"type": "varchar"
+					},
+					{
+						"name": "speed_kmh",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "model_year",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "powertrain_type",
+						"type": "varchar"
+					},
+					{
+						"name": "odometer_km",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 2
+					},
+					{
+						"name": "battery_soc_pct",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "charging_status",
+						"type": "varchar"
+					},
+					{
+						"name": "event_time",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "received_time",
+						"type": "datetime2",
+						"scale": 7
+					},
+					{
+						"name": "receiving_delay_seconds",
+						"type": "int",
+						"precision": 10
+					}
+				],
+				"typeProperties": {
+					"schema": "silver",
+					"table": "vehicle_telemetry"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_SQL_SERVER_SHIR')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DS_CSV_OnPremData')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "LS_ADLSGen2",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"folderPath": "vehicle_telemetry_silver",
+						"fileSystem": "on-prem-data"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/LS_ADLSGen2')]"
 			]
 		}
 	]

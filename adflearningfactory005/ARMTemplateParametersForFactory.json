@@ -5,6 +5,9 @@
 		"factoryName": {
 			"value": "adflearningfactory005"
 		},
+		"LS_SQL_SERVER_SHIR_password": {
+			"value": ""
+		},
 		"LS_ADLSGen2_properties_typeProperties_url": {
 			"value": "https://adflearningstorageacc1.dfs.core.windows.net/"
 		},
@@ -31,6 +34,15 @@
 		},
 		"TR_STORAGE_EVENT_properties_typeProperties_scope": {
 			"value": "/subscriptions/9d7a6bbb-9968-4f35-abe0-da55a8fb7421/resourceGroups/ADF-Learning-RG/providers/Microsoft.Storage/storageAccounts/adflearningstorageacc1"
+		},
+		"LS_SQL_SERVER_SHIR_properties_typeProperties_server": {
+			"value": "Krishna"
+		},
+		"LS_SQL_SERVER_SHIR_properties_typeProperties_database": {
+			"value": "AzureDataEngineeringPractice"
+		},
+		"LS_SQL_SERVER_SHIR_properties_typeProperties_userName": {
+			"value": "ADF_USER"
 		}
 	}
 }
